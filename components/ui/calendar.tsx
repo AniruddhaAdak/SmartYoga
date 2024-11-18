@@ -1,5 +1,4 @@
 'use client';
-
 import * as React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { DayPicker } from 'react-day-picker';
@@ -53,12 +52,17 @@ function Calendar({
         day_hidden: 'invisible',
         ...classNames,
       }}
-      components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
-      }}
       {...props}
-    />
+    >
+      {(state) => (
+        <>
+          <div className="flex justify-between">
+            <ChevronLeft className="h-4 w-4" onClick={state.previousMonth} />
+            <ChevronRight className="h-4 w-4" onClick={state.nextMonth} />
+          </div>
+        </>
+      )}
+    </DayPicker>
   );
 }
 Calendar.displayName = 'Calendar';
