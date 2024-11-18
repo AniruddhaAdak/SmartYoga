@@ -1,26 +1,26 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 const formSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  message: z.string().min(10, "Message must be at least 10 characters"),
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email address'),
+  message: z.string().min(10, 'Message must be at least 10 characters'),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
 export function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
-  
+  const [formMessage, setFormMessage] = useState<string | null>(null);
+  const [isError, setIsError] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -32,20 +32,22 @@ export function ContactForm() {
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
+    setFormMessage(null);
+    setIsError(false);
+
     try {
-      // Simulate API call
+      // Simulate an API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      toast({
-        title: "Message sent!",
-        description: "We'll get back to you as soon as possible.",
-      });
+
+      // On success
+      setFormMessage(
+        "Message sent! We'll get back to you as soon as possible."
+      );
       reset();
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive",
-      });
+      // On error
+      setIsError(true);
+      setFormMessage('Something went wrong. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -56,7 +58,7 @@ export function ContactForm() {
       <div>
         <Input
           placeholder="Your name"
-          {...register("name")}
+          {...register('name')}
           className="w-full"
         />
         {errors.name && (
@@ -68,7 +70,7 @@ export function ContactForm() {
         <Input
           type="email"
           placeholder="Your email"
-          {...register("email")}
+          {...register('email')}
           className="w-full"
         />
         {errors.email && (
@@ -79,7 +81,7 @@ export function ContactForm() {
       <div>
         <Textarea
           placeholder="Your message"
-          {...register("message")}
+          {...register('message')}
           className="min-h-[150px] w-full"
         />
         {errors.message && (
@@ -87,13 +89,20 @@ export function ContactForm() {
         )}
       </div>
 
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? "Sending..." : "Send Message"}
+      <Button type="submit" className="w-full" disabled={isSubmitting}>
+        {isSubmitting ? 'Sending...' : 'Send Message'}
       </Button>
+
+      {/* Success or Error Message */}
+      {formMessage && (
+        <p
+          className={`mt-4 text-center ${
+            isError ? 'text-red-500' : 'text-green-500'
+          }`}
+        >
+          {formMessage}
+        </p>
+      )}
     </form>
   );
 }
